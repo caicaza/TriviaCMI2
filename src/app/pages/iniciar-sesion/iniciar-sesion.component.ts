@@ -57,11 +57,11 @@ export class IniciarSesionComponent implements OnInit {
     onVideoClick() {
       if (this.isIOS()) {
         const videoH = this.videoHorizontal.nativeElement as HTMLVideoElement;
-        videoH.controls = true;
+        videoH.controls = false;
         videoH.play();
 
         const videoV = this.videoVertical.nativeElement as HTMLVideoElement;
-        videoV.controls = true;
+        videoV.controls = false;
         videoV.play();
       }
     }
