@@ -70,6 +70,7 @@
 
     <div class="col-sm-12 col-lg-6">
       <div class="custom-container d-flex flex-column mb-3 my-3 text-center">
+        <div class="container xs-none sm-none md-block lg-block" style="height: 81px;"></div>
         <div class="p-2 d-md-none d-sm-none d-none d-lg-block d-xl-block">
           <div class="card">
             <div class="card-top">
@@ -96,7 +97,10 @@
           class="d-flex justify-content-center"
           style="flex: 1; align-items: center"
         >
-          <button class="btn btn-primary d-flex py-3 mx-2 px-4">
+          <button
+            class="btn btn-primary d-flex py-3 mx-2 px-4"
+            (click)="salir()"
+          >
             <img src="assets/Icons/Puerta3.svg" alt="Icono" class="icono-svg" />
             Salir
           </button>

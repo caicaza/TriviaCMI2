@@ -44,10 +44,12 @@ import { authGuard } from './auth.guard';
 import { InicioSalaComponent } from './pages/inicio-sala/inicio-sala.component';
 import { ChallengersGameComponent } from './pages/challengers-game/challengers-game.component';
 import { EsperarJChallengersComponent } from './components/esperar-jchallengers/esperar-jchallengers.component';
-import { PreguntaGameComponent } from './components/pregunta-game/pregunta-game.component';
-import { PosicionPlayerComponent } from './components/posicion-player/posicion-player.component';
+
 import { RankingChallengerComponent } from './components/ranking-challenger/ranking-challenger.component';
 import { EntradaSalaComponent } from './pages/entrada-sala/entrada-sala.component';
+import { SurvivorGameComponent } from './pages/survivor-game/survivor-game.component';
+import { ClipboardModule } from 'ngx-clipboard';
+
 
 @NgModule({
   declarations: [
@@ -65,15 +67,16 @@ import { EntradaSalaComponent } from './pages/entrada-sala/entrada-sala.componen
     InicioSalaComponent,
     ChallengersGameComponent,
     EsperarJChallengersComponent,
-    PreguntaGameComponent,
-    PosicionPlayerComponent,
     RankingChallengerComponent,
     EntradaSalaComponent,
+    SurvivorGameComponent,
+    
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     DropdownModule,
+    ClipboardModule,
 
     /* ButtonModule,
     DialogModule,
@@ -130,6 +133,11 @@ import { EntradaSalaComponent } from './pages/entrada-sala/entrada-sala.componen
       {
         path: 'JuegoChallengers',
         component: ChallengersGameComponent,
+        //canActivate: [authGuard],
+      },
+      {
+        path: 'JuegoSupervivencia',
+        component: SurvivorGameComponent,
         //canActivate: [authGuard],
       },
       {

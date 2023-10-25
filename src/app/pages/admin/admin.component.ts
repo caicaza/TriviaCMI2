@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  Renderer2,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConstantsService } from 'src/app/constants.service';
@@ -6,6 +12,7 @@ import { EncryptionService } from 'src/app/encryption.service';
 import { Sala } from 'src/app/model/SalaModel';
 import { SalaService } from 'src/app/services/sala.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { ClipboardService } from 'ngx-clipboard';
 
 @Component({
   selector: 'app-admin',
@@ -14,14 +21,20 @@ import { UsuarioService } from 'src/app/services/usuario.service';
   providers: [ConfirmationService, MessageService],
 })
 export class AdminComponent implements OnInit {
+  @ViewChild('closeModal') closeModal!: ElementRef;
+
   misSalas: Sala[] = [];
   auxMisSalas: Sala[] = [];
   existeError: boolean = false;
   result: string = '';
   textoBuscar: string = '';
 
+  currentURL: string = '';
+  currentCodigo: string = '';
+
   salaItem: Sala = {
     idSala: 0,
+    idEncrypt: '',
     nombre: '',
     imagen: '',
     descripcion: '',
@@ -39,7 +52,9 @@ export class AdminComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private encryptionService: EncryptionService,
-    private constantsService: ConstantsService
+    private constantsService: ConstantsService,
+    private _clipboardService: ClipboardService,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
@@ -113,6 +128,42 @@ export class AdminComponent implements OnInit {
   getImageSala(nombreImagen: string): string {
     let imageUrl = `${this.salaServicio.getURLImages()}/${nombreImagen}`;
     return imageUrl;
+  }
+
+  allCopySala() {
+    const textos = [
+      'Sala: ' + this.salaItem.nombre,
+      'Link: ' + this.currentURL,
+      'Código de sala: ' + this.currentCodigo,
+    ];
+    const textoAConcatenar = textos.join('\n');
+    //this._clipboardService.copy(textoAConcatenar);
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(textoAConcatenar)
+        .then(() => {
+          //alert('Texto copiado al portapapeles.');
+        })
+        .catch((err) => {
+          console.error('Error al copiar al portapapeles:', err);
+          this._clipboardService.copyFromContent(textoAConcatenar);
+          // alert('Texto copiado al portapapeles utilizando ngx-clipboard.');
+        });
+    } else {
+      this._clipboardService.copyFromContent(textoAConcatenar);
+      //alert('Texto copiado al portapapeles utilizando ngx-clipboard.');
+    }
+  }
+
+  dataSalaOnModal(sala: Sala) {
+    this.salaItem = sala;
+    let idSala = this.encryptionService.encrypt(sala.idSala.toString());
+    let codigo1 = this.constantsService.randomNumber(10, 99);
+    let codigo2 = this.constantsService.randomNumber(10, 99);
+
+    this.currentURL = `${window.location.origin}/EntradaSala?idSala=${idSala}`;
+    this.currentCodigo = codigo1 + sala.idSala.toString() + codigo2;
+    //console.log(codigo1, codigo2);
   }
 
   cambiarEstado(estado: number, idSala: number) {
@@ -190,6 +241,7 @@ export class AdminComponent implements OnInit {
   }
 
   cambiarPag(ruta: string, id: number) {
+    this.closeModal.nativeElement.click();
     let idSala = this.encryptionService.encrypt(id.toString());
     let params = { idSala };
     this.router.navigate([ruta], { queryParams: params });

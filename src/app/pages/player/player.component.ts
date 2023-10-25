@@ -1,39 +1,49 @@
-import { Component, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { StorageMap } from '@ngx-pwa/local-storage';
 import { ConstantsService } from 'src/app/constants.service';
 import { EncryptionService } from 'src/app/encryption.service';
 import { Sala } from 'src/app/model/SalaModel';
 import { SalaService } from 'src/app/services/sala.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 
-declare var bootstrap: any;
-
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
   styleUrls: ['./player.component.css'],
 })
-export class PlayerComponent {
+export class PlayerComponent implements OnInit {
+  @ViewChild('closeModal') closeModal!: ElementRef;
+
   misSalas: Sala[] = [];
   textoBuscar: string = '';
   existeError: boolean = false;
   result: string = '';
-  idSalaSeleccionada: number = 0;
+  codigo: string = '';
+  errorCodigo: string = '';
 
-  modalElement: any;
-  modal: any;
+  sala: Sala = {
+    idSala: 0,
+    idEncrypt: '',
+    nombre: '',
+    imagen: '',
+    descripcion: '',
+    idModoJuego: 0,
+    modoJuego: '',
+    estado: 0,
+    fecha_creacion: '',
+    fecha_modificacion: '',
+  };
 
   constructor(
     private router: Router,
     private usuarioServicio: UsuarioService,
     private salaServicio: SalaService,
     private encryptionService: EncryptionService,
-    private constantsService: ConstantsService,
-    private el: ElementRef
-  ) {
-    //this.modalElement = this.el.nativeElement.querySelector('#exampleModal');
-    //this.modal = new bootstrap.Modal(this.modalElement);
-  }
+    private constantsService: ConstantsService
+  ) {}
+
+  ngOnInit(): void {}
 
   buscar() {
     if (this.textoBuscar.trim() !== '') {
@@ -70,29 +80,29 @@ export class PlayerComponent {
     this.router.navigate([ruta], { queryParams: params });
   }
 
-  abrirModal(idSala: number) {
-    this.idSalaSeleccionada = idSala;
+  abrirModal(sala: Sala) {
+    this.sala = sala;
   }
 
   ingresarSala() {
-    // Aquí puedes agregar la lógica para verificar si el código es correcto
-    if (this.codigoIngresadoEsCorrecto()) {
-      // Navega a la sala con los query params
-      /* this.router.navigate(['/EntradaSala'], {
-        queryParams: { idSala: this.idSalaSeleccionada },
-      }); */
-      this.cambiarPag('/EntradaSala', this.idSalaSeleccionada);
-      // Cierra el modal
-      this.modal.hide();
-      //document.getElementById('exampleModal')?.click();
-    } else {
-      // Muestra un mensaje de error o realiza otra acción si el código no es correcto
-    }
-  }
+    let idSala = this.sala.idSala.toString();
+    let codigo = this.codigo.trim();
+    let auxCodigo = '';
 
-  codigoIngresadoEsCorrecto(): boolean {
-    // Aquí debes implementar la lógica para verificar si el código es correcto
-    return true; // Reemplaza esto con tu lógica real
+    if (codigo !== '') {
+      for (let i = 0; i < idSala.length; i++) {
+        auxCodigo += codigo[i + 2];
+      }
+
+      if (auxCodigo === idSala) {
+        this.closeModal.nativeElement.click();
+        this.cambiarPag('/EntradaSala', this.sala.idSala);
+      } else {
+        this.errorCodigo = 'El ID de acceso es incorrecto!';
+      }
+    } else {
+      this.errorCodigo = 'Ingrese el ID de acceso';
+    }
   }
 
   cerrarSesion() {
